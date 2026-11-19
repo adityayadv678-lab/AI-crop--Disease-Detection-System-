@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>फसल डॉक्टर | Crop Doctor</title>
+<style>
+:root{--green:#176b45;--green2:#239563;--ink:#183329;--muted:#64756c;--bg:#f3f8f4;--line:#dce9df;--white:#fff;--gold:#e7a52c}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Devanagari",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#104b34,#218557);color:white;padding:22px max(18px,calc((100% - 1080px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:#ffffff20;display:grid;place-items:center;font-size:25px}.brand h1{font-size:20px;margin:0}.brand p{margin:2px 0 0;color:#d8f2e2;font-size:12px}
+.pill{border:1px solid #ffffff55;border-radius:30px;padding:7px 12px;font-size:12px;color:#e8fff0}
+main{max-width:1080px;margin:30px auto;padding:0 18px}.intro{margin-bottom:22px}.intro h2{font-size:clamp(24px,4vw,34px);margin:0 0 8px}.intro p{color:var(--muted);margin:0;line-height:1.7}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}.panel{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 8px 24px #173e2510}
+.panel h3{margin:0 0 16px;font-size:18px}.upload{border:2px dashed #9bc9aa;border-radius:16px;min-height:245px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;background:#f8fcf9;cursor:pointer;overflow:hidden}.upload:hover{border-color:var(--green2);background:#f1faf4}.upload .upicon{font-size:42px}.upload strong{display:block;margin:8px 0 4px}.upload small{color:var(--muted)}#preview{display:none;max-width:100%;max-height:290px;object-fit:contain;border-radius:12px}
+input[type=file]{display:none}label.field{display:block;font-size:13px;font-weight:650;margin:17px 0 7px}select{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:white;font:inherit;color:var(--ink)}
+.btn{border:0;background:var(--green);color:white;padding:13px 18px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;width:100%;margin-top:16px;transition:.2s}.btn:hover{background:#105538}.btn:disabled{opacity:.45;cursor:not-allowed}.hint{font-size:12px;color:var(--muted);line-height:1.6;margin:12px 0 0}
+.result{margin-top:20px;display:none}.result-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}.result-icon{width:42px;height:42px;border-radius:13px;background:#e5f5e9;display:grid;place-items:center;font-size:22px}.result-head h3{margin:0}.status{display:inline-block;border-radius:30px;padding:5px 10px;background:#fff4dc;color:#855900;font-size:12px;font-weight:700;margin-top:5px}
+.result-box{background:#f7fbf8;border:1px solid var(--line);padding:15px;border-radius:14px;margin-top:12px}.result-box h4{margin:0 0 7px;font-size:14px}.result-box p{margin:0;color:#53665b;line-height:1.7;font-size:14px}.result-box ul{margin:7px 0 0;padding-left:20px;color:#53665b;line-height:1.8;font-size:14px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}.metric{background:white;border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center}.metric b{font-size:19px;color:var(--green);display:block}.metric span{font-size:11px;color:var(--muted)}
+.disclaimer{background:#fff8e9;border:1px solid #f2dfb7;color:#76551b;border-radius:13px;padding:13px;font-size:12px;line-height:1.6;margin-top:16px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px 15px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}header{padding:17px 18px}.pill{display:none}main{margin:22px auto}.panel{padding:17px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">🌱</div><div><h1>फसल डॉक्टर</h1><p>Crop Doctor · Offline Plant Health Checker</p></div></div>
+  <div class="pill">🔒 आपकी फोटो आपके डिवाइस पर रहती है</div>
+</header>
+<main>
+  <section class="intro">
+    <h2>पौधे की सेहत जांचें 🌿</h2>
+    <p>पत्ते की साफ फोटो अपलोड करें। यह टूल फोटो के रंग और धब्बों का स्थानीय विश्लेषण करके संभावित समस्या और देखभाल के सुझाव देगा।</p>
+  </section>
+  <div class="layout">
+    <section class="panel">
+      <h3>📷 पौधे की फोटो अपलोड करें</h3>
+      <label class="upload" for="photoInput" id="uploadArea">
+        <span class="upicon">📸</span><strong>फोटो चुनने के लिए यहां क्लिक करें</strong>
+        <small>JPG, PNG या WEBP · साफ पत्ते की फोटो बेहतर रहेगी</small>
+        <img id="preview" alt="अपलोड की गई पौधे की फोटो">
+      </label>
+      <input id="photoInput" type="file" accept="image/*">
+      <label class="field" for="crop">फसल चुनें</label>
+      <select id="crop">
+        <option value="सामान्य पौधा">सामान्य पौधा / पता नहीं</option>
+        <option>टमाटर</option><option>आलू</option><option>गेहूं</option><option>धान</option>
+        <option>कपास</option><option>मिर्च</option><option>बैंगन</option><option>मक्का</option>
+        <option>नींबू</option><option>आम</option><option>अन्य</option>
+      </select>
+      <button class="btn" id="analyzeBtn" disabled>🔍 फोटो का विश्लेषण करें</button>
+      <p class="hint">बेहतर परिणाम के लिए एक ही पत्ते की फोटो लें। पत्ते पर पर्याप्त रोशनी हो और फोटो धुंधली न हो।</p>
+    </section>
+    <section class="panel">
+      <h3>🩺 जांच रिपोर्ट</h3>
+      <div id="emptyState" style="text-align:center;padding:48px 12px;color:#829188">
+        <div style="font-size:48px">🧪</div>
+        <strong style="display:block;color:#456052;margin:10px">रिपोर्ट यहां दिखाई देगी</strong>
+        <span style="font-size:13px">पहले पौधे की फोटो अपलोड करें और विश्लेषण करें।</span>
+      </div>
+      <div class="result" id="result">
+        <div class="result-head"><div class="result-icon">🌿</div><div><h3 id="diagnosis">विश्लेषण पूरा</h3><span class="status" id="confidence">प्रारंभिक संकेत</span></div></div>
+        <div class="metrics">
+          <div class="metric"><b id="greenVal">—</b><span>हरे पिक्सेल</span></div>
+          <div class="metric"><b id="yellowVal">—</b><span>पीले पिक्सेल</span></div>
+          <div class="metric"><b id="brownVal">—</b><span>भूरे/गहरे पिक्सेल</span></div>
+        </div>
+        <div class="result-box"><h4>🔎 फोटो में क्या दिखा?</h4><p id="observation"></p></div>
+        <div class="result-box"><h4>💊 क्या करें?</h4><ul id="treatment"></ul></div>
+        <div class="result-box"><h4>🌱 आगे की देखभाल</h4><ul id="care"></ul></div>
+        <div class="disclaimer">⚠️ यह ऑफलाइन रंग-आधारित अनुमान है, प्रशिक्षित AI रोग पहचान मॉडल नहीं। रोशनी, मिट्टी, उम्र और कैमरे के कारण परिणाम बदल सकते हैं। किसी दवा/कीटनाशक का उपयोग करने से पहले स्थानीय कृषि विशेषज्ञ या कृषि विज्ञान केंद्र से पुष्टि करें।</div>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>© 2026 फसल डॉक्टर · पूरी तरह ब्राउज़र में काम करता है · कोई API या सर्वर नहीं</footer>
+<script>
+const input=document.getElementById('photoInput'), preview=document.getElementById('preview');
+const uploadArea=document.getElementById('uploadArea'), analyzeBtn=document.getElementById('analyzeBtn');
+let imageReady=false;
+input.addEventListener('change',()=>{
+  const file=input.files&&input.files[0]; if(!file)return;
+  if(!file.type.startsWith('image/')){alert('कृपया image file चुनें।');return;}
+  const url=URL.createObjectURL(file);
+  preview.onload=()=>{preview.style.display='block';uploadArea.querySelector('.upicon').style.display='none';uploadArea.querySelector('strong').style.display='none';uploadArea.querySelector('small').style.display='none';imageReady=true;analyzeBtn.disabled=false;};
+  preview.onerror=()=>{alert('यह फोटो खुल नहीं पाई। दूसरी फोटो चुनें।');};
+  preview.src=url;
+});
+function analyzePixels(img){
+  const max=360, scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+  const w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);
+  const d=ctx.getImageData(0,0,w,h).data;let green=0,yellow=0,brown=0,leaf=0;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2],maxc=Math.max(r,g,b),minc=Math.min(r,g,b);
+    // केवल रंगीन/पत्ती जैसे पिक्सेल का मोटा अनुमान; सफेद/काली पृष्ठभूमि को सीमित रखें
+    const isGreen=(g>r*1.08&&g>b*1.04&&g>45);
+    const isYellow=(r>95&&g>90&&b<Math.min(r,g)*0.78&&Math.abs(r-g)<95);
+    const isBrown=(r>55&&r>g*1.12&&g>b*1.05&&r<190);
+    if(isGreen||isYellow||isBrown){leaf++;if(isGreen)green++;if(isYellow)yellow++;if(isBrown)brown++;}
+  }
+  const denom=Math.max(1,leaf);
+  return {green:green/denom*100,yellow:yellow/denom*100,brown:brown/denom*100,leaf};
+}
+function pct(n){return Math.round(n)+'%'}
+function addItems(id,items){const ul=document.getElementById(id);ul.innerHTML='';items.forEach(t=>{const li=document.createElement('li');li.textContent=t;ul.appendChild(li);});}
+analyzeBtn.addEventListener('click',()=>{
+  if(!imageReady)return;
+  analyzeBtn.disabled=true;analyzeBtn.textContent='विश्लेषण हो रहा है…';
+  setTimeout(()=>{
+    try{
+      const s=analyzePixels(preview);
+      document.getElementById('emptyState').style.display='none';
+      document.getElementById('result').style.display='block';
+      document.getElementById('greenVal').textContent=pct(s.green);
+      document.getElementById('yellowVal').textContent=pct(s.yellow);
+      document.getElementById('brownVal').textContent=pct(s.brown);
+      let title,confidence,obs,treat,care;
+      if(s.leaf<25){
+        title='स्पष्ट पत्ती पहचान नहीं हुई';confidence='कम विश्वसनीय संकेत';
+        obs='फोटो में पत्ती जैसे हरे, पीले या भूरे रंग के पर्याप्त पिक्सेल नहीं मिले।';
+        treat=['पत्ती को पास से, अच्छी रोशनी में दोबारा फोटो लें।','पत्ती और पृष्ठभूमि दोनों स्पष्ट दिखें।'];
+        care=['एक स्वस्थ और प्रभावित पत्ती की अलग-अलग फोटो लें।','फसल का सही प्रकार चुनें।'];
+      }else if(s.brown>=18){
+        title='भूरे धब्बे / पत्ती झुलसा जैसे लक्षण';confidence='संभावित समस्या · पुष्टि जरूरी';
+        obs='फोटो में भूरे या गहरे रंग के हिस्से अपेक्षाकृत अधिक दिखे। ये धब्बे, पुरानी क्षति, मिट्टी या छाया भी हो सकते हैं।';
+        treat=['प्रभावित पत्तियों को अलग रखें; बहुत खराब पत्ते साफ औजार से हटाएं।','पत्तियों को लंबे समय तक गीला न रहने दें और पौधों के बीच हवा आने दें।','धब्बे फैल रहे हों तो स्थानीय कृषि विशेषज्ञ से रोग की पुष्टि कराएं।'];
+        care=['ऊपर से बार-बार पानी डालने से बचें; जड़ों में पानी दें।','औजार साफ रखें और पौधों के बीच उचित दूरी रखें।'];
+      }else if(s.yellow>=22){
+        title='पत्तियों का पीलापन';confidence='संभावित पोषण/पानी तनाव';
+        obs='फोटो में पीले रंग के हिस्से अधिक दिखे। पीलापन पोषक तत्वों की कमी, अधिक पानी, कम पानी या प्राकृतिक पत्ती उम्र के कारण हो सकता है।';
+        treat=['मिट्टी की नमी जांचें; पानी तभी दें जब ऊपरी मिट्टी सूखने लगे।','जल निकासी जांचें; जड़ों में पानी जमा न होने दें।','नई और पुरानी पत्तियों में पीलापन अलग-अलग कारणों से हो सकता है; खाद देने से पहले कारण की पुष्टि करें।'];
+        care=['संतुलित खाद का उपयोग मिट्टी/फसल की जरूरत के अनुसार करें।','कुछ दिनों तक नई पत्तियों के रंग और बदलाव पर नजर रखें।'];
+      }else if(s.green>=55&&s.brown<10&&s.yellow<15){
+        title='पत्ती सामान्यतः हरी दिख रही है';confidence='कोई स्पष्ट रंग संकेत नहीं';
+        obs='फोटो में हरे रंग का हिस्सा अधिक और भूरे/पीले हिस्से कम मिले। केवल रंग से पौधे का पूरी तरह स्वस्थ होना साबित नहीं होता।';
+        treat=['फिलहाल कोई बीमारी स्पष्ट नहीं दिख रही।','पत्तियों के नीचे की तरफ कीट, अंडे या जाले भी जांचें।'];
+        care=['संतुलित सिंचाई और उचित धूप बनाए रखें।','हर सप्ताह पत्तियों के दोनों तरफ निरीक्षण करें।'];
+      }else{
+        title='मिश्रित रंग परिवर्तन';confidence='अनिश्चित परिणाम';
+        obs='फोटो में कई तरह के रंग मिले, लेकिन किसी एक लक्षण का स्पष्ट प्रभुत्व नहीं है।';
+        treat=['पत्ती के प्रभावित हिस्से की नजदीक से फोटो लें।','कीट, छेद, सफेद परत और पत्ती के नीचे के हिस्से को भी जांचें।','लक्षण बढ़ें तो कृषि विशेषज्ञ से सलाह लें।'];
+        care=['सिंचाई और जल निकासी संतुलित रखें।','एक ही पौधे की नई फोटो लेकर बदलाव की तुलना करें।'];
+      }
+      document.getElementById('diagnosis').textContent=title;
+      document.getElementById('confidence').textContent=confidence;
+      document.getElementById('observation').textContent='चुनी गई फसल: '+document.getElementById('crop').value+'। '+obs;
+      addItems('treatment',treat);addItems('care',care);
+    }catch(e){alert('विश्लेषण नहीं हो पाया। कृपया दूसरी फोटो आजमाएं।');}
+    analyzeBtn.disabled=false;analyzeBtn.textContent='🔍 दोबारा विश्लेषण करें';
+  },80);
+});
+</script>
+</body>
+</html>
